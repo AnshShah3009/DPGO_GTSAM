@@ -1,6 +1,8 @@
 import numpy as np
 from graphviz import Digraph
 import gtsam
+import argparse
+import open3d as o3d
 from gtsam import (
     Pose3,
     Rot3,
@@ -11,13 +13,13 @@ from gtsam import (
     BetweenFactorPose3,
     Symbol,
 )
-import argparse
+
 
 # GNC LM Optimizer
 LM_params = gtsam.LevenbergMarquardtParams()
 gnc_lm_params = gtsam.GncLMParams(LM_params)
 
-# print("Welcome to RRC DPGO")
+print("Welcome to RRC DPGO")
 
 Robot_Symbol = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
 
@@ -33,9 +35,6 @@ class Robot:
     # getters and setters
     def set_symbol(self, symbol):
         self.symbol = symbol
-
-    def get_symbol(self):
-        return self.symbol
 
     def set_path(self, file_path):
         self.file_path = file_path
@@ -61,6 +60,9 @@ class Robot:
     def get_robot_id(self):
         return self.robot_id
 
+    def get_symbol(self):
+        return self.symbol
+    
     def read_g2o_file(self):
         with open(self.file_path, "r") as f:
             for line in f:
@@ -78,29 +80,29 @@ class Robot:
                     )
 
                     # Save the SE3 pose as a 4x4 transformation matrix
-                    pose_matrix = np.array(
-                        [
-                            [
-                                1 - 2 * qy**2 - 2 * qz**2,
-                                2 * (qx * qy - qw * qz),
-                                2 * (qx * qz + qw * qy),
-                                x,
-                            ],
-                            [
-                                2 * (qx * qy + qw * qz),
-                                1 - 2 * qx**2 - 2 * qz**2,
-                                2 * (qy * qz - qw * qx),
-                                y,
-                            ],
-                            [
-                                2 * (qx * qz - qw * qy),
-                                2 * (qy * qz + qw * qx),
-                                1 - 2 * qx**2 - 2 * qy**2,
-                                z,
-                            ],
-                            [0, 0, 0, 1],
-                        ]
-                    )
+                    # pose_matrix = np.array(
+                    #     [
+                    #         [
+                    #             1 - 2 * qy**2 - 2 * qz**2,
+                    #             2 * (qx * qy - qw * qz),
+                    #             2 * (qx * qz + qw * qy),
+                    #             x,
+                    #         ],
+                    #         [
+                    #             2 * (qx * qy + qw * qz),
+                    #             1 - 2 * qx**2 - 2 * qz**2,
+                    #             2 * (qy * qz - qw * qx),
+                    #             y,
+                    #         ],
+                    #         [
+                    #             2 * (qx * qz - qw * qy),
+                    #             2 * (qy * qz + qw * qx),
+                    #             1 - 2 * qx**2 - 2 * qy**2,
+                    #             z,
+                    #         ],
+                    #         [0, 0, 0, 1],
+                    #     ]
+                    # )
 
                     pose = Pose3(Rot3.Quaternion(qw, qx, qy, qz), Point3(x, y, z))
 
@@ -119,29 +121,29 @@ class Robot:
                     )
 
                     # Save the SE3 edge as a 4x4 transformation matrix
-                    edge_matrix = np.array(
-                        [
-                            [
-                                1 - 2 * qy**2 - 2 * qz**2,
-                                2 * (qx * qy - qw * qz),
-                                2 * (qx * qz + qw * qy),
-                                x,
-                            ],
-                            [
-                                2 * (qx * qy + qw * qz),
-                                1 - 2 * qx**2 - 2 * qz**2,
-                                2 * (qy * qz - qw * qx),
-                                y,
-                            ],
-                            [
-                                2 * (qx * qz - qw * qy),
-                                2 * (qy * qz + qw * qx),
-                                1 - 2 * qx**2 - 2 * qy**2,
-                                z,
-                            ],
-                            [0, 0, 0, 1],
-                        ]
-                    )
+                    # edge_matrix = np.array(
+                    #     [
+                    #         [
+                    #             1 - 2 * qy**2 - 2 * qz**2,
+                    #             2 * (qx * qy - qw * qz),
+                    #             2 * (qx * qz + qw * qy),
+                    #             x,
+                    #         ],
+                    #         [
+                    #             2 * (qx * qy + qw * qz),
+                    #             1 - 2 * qx**2 - 2 * qz**2,
+                    #             2 * (qy * qz - qw * qx),
+                    #             y,
+                    #         ],
+                    #         [
+                    #             2 * (qx * qz - qw * qy),
+                    #             2 * (qy * qz + qw * qx),
+                    #             1 - 2 * qx**2 - 2 * qy**2,
+                    #             z,
+                    #         ],
+                    #         [0, 0, 0, 1],
+                    #     ]
+                    # )
 
                     edge_pose = Pose3(Rot3.Quaternion(qw, qx, qy, qz), Point3(x, y, z))
 
